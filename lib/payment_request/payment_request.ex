@@ -79,7 +79,7 @@ defmodule StarkBank.PaymentRequest do
     def create(payment_requests, options \\ []) do
         case Rest.post(
             resource(),
-            Enum.map(payment_requests, fn request -> %PaymentRequest{request | type: get_type(request.payment)} end),
+            Enum.map(payment_requests, fn %PaymentRequest{} = request -> %PaymentRequest{request | type: get_type(request.payment)} end),
             options
         ) do
             {:ok, requests} -> {:ok, requests}
@@ -94,7 +94,7 @@ defmodule StarkBank.PaymentRequest do
     def create!(payment_requests, options \\ []) do
         Rest.post!(
             resource(),
-            Enum.map(payment_requests, fn request -> %PaymentRequest{request | type: get_type(request.payment)} end),
+            Enum.map(payment_requests, fn %PaymentRequest{} = request -> %PaymentRequest{request | type: get_type(request.payment)} end),
             options
         )
     end

@@ -27,8 +27,20 @@ defmodule StarkBank.Utils.Check do
   end
 
   def datetime(data) when is_binary(data) do
-    {:ok, datetime, _utc_offset} = data |> DateTime.from_iso8601()
-    datetime
+    case DateTime.from_iso8601(data) do
+      {:ok, datetime, _utc_offset} ->
+        datetime
+
+      {:error, :invalid_format} ->
+        case Date.from_iso8601(data) do
+          {:ok, date} ->
+            date
+
+          {:error, _reason} ->
+            raise ArgumentError,
+                  "expected a valid ISO 8601 datetime or date string, got: #{inspect(data)}"
+        end
+    end
   end
 
   def date(data) when is_nil(data) do
@@ -114,11 +126,11 @@ defmodule StarkBank.Utils.Check do
 
   def language() do
     case Application.fetch_env(:starkbank, :language) do
-      {:ok, 'en-US'} -> 'en-US'
-      {:ok, "en-US"} -> 'en-US'
-      {:ok, 'pt-BR'} -> 'pt-BR'
-      {:ok, "pt-BR"} -> 'pt-BR'
-      :error -> 'en-US'
+      {:ok, ~c"en-US"} -> ~c"en-US"
+      {:ok, "en-US"} -> ~c"en-US"
+      {:ok, ~c"pt-BR"} -> ~c"pt-BR"
+      {:ok, "pt-BR"} -> ~c"pt-BR"
+      :error -> ~c"en-US"
     end
   end
 
